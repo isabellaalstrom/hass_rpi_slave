@@ -1,0 +1,48 @@
+homeassistant:
+  name: Home
+  latitude: !secret lat_coord
+  longitude: !secret long_coord
+  elevation: 50
+  unit_system: metric
+  time_zone: Europe/Stockholm
+  customize: !include customize.yaml
+  packages: !include_dir_named packages
+frontend:
+config:
+http:
+  api_password: !secret http_password
+  base_url: !secret base_url
+updater:
+history:
+logbook:
+map:
+
+notify:
+  - name: Pushbullet Isa
+    platform: pushbullet
+    api_key: !secret pushbullet_key
+
+device_tracker:
+  - platform: bluetooth_tracker
+    track_new_devices: false
+
+mqtt:
+  broker: !secret mqtt_broker
+  port: !secret mqtt_port
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+
+# mqtt_statestream:
+#   base_topic: homeassistant
+
+mqtt_eventstream:
+  publish_topic: slave/rpi
+  # subscribe_topic: master/topic
+
+logger:
+  default: warn
+  logs:
+    homeassistant.components.mqtt: debug
+    homeassistant.components.sensor.miflora: fatal
+    homeassistant.components.switch.switchbot: debug
+    homeassistant.components.switch: debug

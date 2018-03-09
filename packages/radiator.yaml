@@ -1,0 +1,50 @@
+switch:
+  - platform: switchbot
+    name: 'Stefan radiator'  
+    mac: 'EA:E1:11:E2:B1:77'
+
+  - platform: mqtt
+    state_topic: "home/stefan/radiator/set"
+    command_topic: "home/stefan/radiator/set"
+    name: 'stefan radiator mqtt'
+    payload_on: 'on'
+    payload_off: 'off'
+
+automation:
+  - alias: 'Radiator turn on'
+    initial_state: 'on'
+    trigger:
+      platform: state
+      entity_id: switch.stefan_radiator_mqtt
+      to: 'on'
+    action:
+      - service: switch.turn_on
+        entity_id: switch.stefan_radiator
+
+  - alias: 'Radiator turn off'
+    initial_state: 'on'
+    trigger:
+      platform: state
+      entity_id: switch.stefan_radiator_mqtt
+      to: 'off'
+    action:
+      - service: switch.turn_off
+        entity_id: switch.stefan_radiator
+
+  - alias: 'Radiator communication error'
+    initial_state: 'on'
+    trigger:
+      platform: event
+      event_type: system_log_event
+    condition:
+      condition: template
+      value_template: '{{ "Cannot connect to switchbot" in trigger.event.data.message }}'
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "home/stefan/radiator/failed"
+          payload: 'Failed'
+      # - service: notify.pushbullet_isa
+      #   data:
+      #     title: 'Radiator'
+      #     message: 'Failed to turn on, try again'
